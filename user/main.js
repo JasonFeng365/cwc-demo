@@ -2,7 +2,6 @@
   const $ = (selector) => document.querySelector(selector);
   let socket;
   let activeLayout;
-  let layoutIndex = 0;
   let userId;
   let testId;
   let startedAt = 0;
@@ -12,6 +11,7 @@
   let previousPanelScroll = 0;
   let submitting = false;
   let pendingPayload = null;
+  let countdownVersion = 0;
 
   const notice = $('#notice');
   const study = $('#study');
@@ -28,17 +28,10 @@
       </article>`).join('');
   }
 
-  function showLayout(index) {
-    if (index >= window.STUDY_LAYOUTS.length) {
-      study.hidden = true;
-      $('#finished').hidden = false;
-      progress.textContent = 'Complete';
-      activeLayout = null;
-      return;
-    }
-    const layout = window.STUDY_LAYOUTS[index];
+  function showLayout(layoutId) {
+    const layout = window.STUDY_LAYOUTS.find((item) => item.id === layoutId);
+    if (!layout) return;
     activeLayout = layout.id;
-    layoutIndex = index;
     demo.querySelectorAll('.layout-panel').forEach((panel) => {
       panel.hidden = panel.dataset.layout !== layout.id;
     });
@@ -52,22 +45,32 @@
     submitting = false;
     pendingPayload = null;
     errorEl.hidden = true;
-    progress.textContent = `Layout ${index + 1} of ${window.STUDY_LAYOUTS.length}`;
+    progress.textContent = `Testing: ${layout.title}`;
   }
 
-  async function runCountdown(seconds) {
+  function finishRound() {
+    activeLayout = null;
+    study.hidden = true;
+    $('#finished').hidden = false;
+    progress.textContent = 'Round complete';
+  }
+
+  async function runCountdown(seconds, layoutId, version) {
     notice.hidden = true;
     countdownEl.hidden = false;
     for (let remaining = seconds; remaining > 0; remaining--) {
+      if (version !== countdownVersion) return;
       countdownEl.textContent = remaining;
       await new Promise((resolve) => window.setTimeout(resolve, 1000));
     }
+    if (version !== countdownVersion) return;
     countdownEl.textContent = 'Go!';
     await new Promise((resolve) => window.setTimeout(resolve, 450));
+    if (version !== countdownVersion) return;
     countdownEl.hidden = true;
     study.hidden = false;
     $('#finished').hidden = true;
-    showLayout(0);
+    showLayout(layoutId);
   }
 
   async function submitResult() {
@@ -93,7 +96,7 @@
       });
       if (!response.ok) throw new Error(`Server returned ${response.status}`);
       await response.json();
-      showLayout(layoutIndex + 1);
+      finishRound();
     } catch (error) {
       submitting = false;
       errorEl.innerHTML = `Could not send your result. Check your connection and <button class="retry" data-action="retry">retry</button>.`;
@@ -125,7 +128,7 @@
       section.items.forEach((item) => {
         if (item.toLowerCase().includes(query)) {
           const target = section.id === 'account-settings' && item === 'Log out';
-          matches.push(`<button class="search-result${target ? ' target-option' : ''}" ${target ? 'data-action="success"' : ''}><b>${escapeHtml(item)}</b><small>${escapeHtml(section.title)}</small></button>`);
+          matches.push(`<button class="search-result" ${target ? 'data-action="success"' : ''}><b>${escapeHtml(item)}</b><small>${escapeHtml(section.title)}</small></button>`);
         }
       });
     });
@@ -197,12 +200,15 @@
     });
     socket.on('waiting', (data) => { notice.textContent = data.message; });
     socket.on('start_test', (data) => {
+      if (!window.STUDY_LAYOUTS.some((layout) => layout.id === data.ui_type)) return;
       activeLayout = null;
       study.hidden = true;
       prepareLayouts();
       testId = data.test_id;
       $('#finished').hidden = true;
-      runCountdown(Number(data.countdown) || 0);
+      progress.textContent = `Starting: ${window.STUDY_LAYOUTS.find((layout) => layout.id === data.ui_type).title}`;
+      const version = ++countdownVersion;
+      runCountdown(Number(data.countdown) || 0, data.ui_type, version);
     });
   }
 

@@ -12,7 +12,7 @@ window.STUDY_LAYOUTS = [
         <h3>${escapeHtml(section.title)}</h3>
         <div class="option-list">${section.items.map((item) => {
           const target = section.id === 'account-settings' && item === 'Log out';
-          return `<button class="option-row${target ? ' target-option' : ''}" ${target ? 'data-action="success"' : ''}>${escapeHtml(item)}<span>›</span></button>`;
+          return `<button class="option-row" ${target ? 'data-action="success"' : ''}>${escapeHtml(item)}<span>›</span></button>`;
         }).join('')}</div>
       </section>`).join('')
   },
@@ -24,7 +24,7 @@ window.STUDY_LAYOUTS = [
         <h3>${escapeHtml(section.title)}</h3>
         <div class="card-options">${section.items.map((item) => {
           const target = section.id === 'account-settings' && item === 'Log out';
-          return `<button class="option-chip${target ? ' target-option' : ''}" ${target ? 'data-action="success"' : ''}>${escapeHtml(item)}</button>`;
+          return `<button class="option-chip" ${target ? 'data-action="success"' : ''}>${escapeHtml(item)}</button>`;
         }).join('')}</div>
       </section>`).join('')}</div>`
   },
@@ -49,7 +49,7 @@ window.STUDY_LAYOUTS = [
           <div class="menu-options" data-options="${section.id}" hidden>
             ${section.items.map((item) => {
               const target = section.id === 'account-settings' && item === 'Log out';
-              return `<button class="option-row${target ? ' target-option' : ''}" ${target ? 'data-action="success"' : ''}>${escapeHtml(item)}<span>›</span></button>`;
+              return `<button class="option-row" ${target ? 'data-action="success"' : ''}>${escapeHtml(item)}<span>›</span></button>`;
             }).join('')}
           </div>
         </section>`).join('')}</div>`
