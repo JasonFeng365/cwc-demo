@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find Account Settings — UI Study</title>
+  <link rel="stylesheet" href="user/styles.css">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
+  <script src="user/config.js" defer></script>
+  <script src="user/settings.js" defer></script>
+  <script src="user/layouts.js" defer></script>
+  <script src="user/main.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div><p class="eyebrow">CLASSROOM UI STUDY</p><h1>Find “Log out”</h1></div>
+      <span class="progress" id="progress">Waiting to start</span>
+    </header>
+
+    <section class="notice" id="notice" role="status" aria-live="polite">
+      Waiting for the facilitator to start the test. Keep this page open.
+    </section>
+    <section class="countdown" id="countdown" aria-live="assertive" hidden></section>
+
+    <section id="study" hidden>
+      <p class="instructions">Find and select <strong>Log out</strong> in <strong>Account settings</strong>.</p>
+      <div id="demo" class="demo" aria-live="polite"></div>
+      <p class="error" id="error" hidden></p>
+    </section>
+    <section id="finished" class="finished" hidden>
+      <h2>All done — thank you!</h2>
+      <p>Your four task results have been sent.</p>
+      <p>You can now take part in the class discussion.</p>
+    </section>
+  </main>
+</body>
+</html>
